@@ -8,6 +8,7 @@ package assignment1;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -32,6 +33,7 @@ public class Assignment1 {
     private static final ArrayList<String> gdpgvol = new ArrayList<>();
     private static final ArrayList<String> pivol = new ArrayList<>();
     private static final ArrayList<String> spreadvol = new ArrayList<>();
+    static DecimalFormat df = new DecimalFormat("#.######");
 
     /**
      * @param args the command line arguments
@@ -67,6 +69,7 @@ public class Assignment1 {
                     spreadvol.add(temp[12]);
                 }
             }
+            //add all attributes into arraylist
             arraylist.add(treat);
             arraylist.add(ldebt);
             arraylist.add(lgdpg);
@@ -81,29 +84,56 @@ public class Assignment1 {
             arraylist.add(pivol);
             arraylist.add(spreadvol);
 
-            //get outliers
+            //remove outliers
             for (int i = 1; i < arraylist.size(); i++) {
                 zScore(arraylist.get(i));
             }
-            System.out.println(arraylist.get(1));
 
+            //print correlation matrix
+            System.out.print("           ");
+            for (int j = 0; j < arraylist.size(); j++) {
+                System.out.printf("%13s", arraylist.get(j).get(0));
+            }
+            System.out.println("");
+            System.out.println("           ----------------------------------"
+                    + "---------------------------------------------"
+                    + "---------------------------------------------"
+                    + "---------------------------------------------");
+            for (int i = 0; i < arraylist.size(); i++) {
+                System.out.printf("%-10s|   ", arraylist.get(i).get(0));
+                for (int j = 0; j < arraylist.size(); j++) {
+                    if (j <= i) {
+                        System.out.printf("%10s", "             ");
+                    } else {
+                        System.out.printf("%10s   ", df.format(correlation(arraylist.get(i), arraylist.get(j))));
+                    }
+                }
+                System.out.println();
+                
+            }
+            //System.out.println(correlation(spreadvol, pivol));
         } catch (Exception ex) {
             System.out.println(ex);
         }
     }
 
-    static double mean(ArrayList<String> temp) {
-        double dtemp = 0;
+    static double sum(ArrayList<String> temp) {
+        double sum = 0;
+        //i is 1 because 0 is the title
         for (int i = 1; i < temp.size(); i++) {
-            dtemp += Double.parseDouble(temp.get(i));
+            sum += Double.parseDouble(temp.get(i));
         }
-        return (dtemp / (temp.size() - 1));
+        return sum;
+    }
+
+    static double mean(ArrayList<String> temp) {
+        return (sum(temp) / (temp.size() - 1));
     }
 
     static double median(ArrayList<String> temp) {
         int val = temp.size();
         double[] temp1 = new double[val];
-
+        //i is 1 because 0 is the title
         for (int i = 1; i < val; i++) {
             temp1[i] = (Double.parseDouble(temp.get(i)));
         }
@@ -116,6 +146,24 @@ public class Assignment1 {
         } else {
             return (temp1[middle - 1] + temp1[middle]) / 2.0;
         }
+    }
+
+    static double standardDeviation(ArrayList<String> temp) {
+        double mTemp = mean(temp);
+        double sum = 0;
+        //i is 1 because 0 is the title
+        for (int i = 1; i < temp.size(); i++) {
+            sum += Math.pow(Double.parseDouble(temp.get(i)) - mTemp, 2);
+        }
+        return Math.sqrt(sum / (temp.size() - 1));
+    }
+
+    static ArrayList<Double> product(ArrayList<String> a, ArrayList<String> b) {
+        ArrayList<Double> c = new ArrayList<>();
+        for (int i = 1; i < a.size(); i++) {
+            c.add((Double.parseDouble(a.get(i)) * Double.parseDouble(b.get(i))));
+        }
+        return c;
     }
 
     //Using modified z-score
@@ -131,15 +179,14 @@ public class Assignment1 {
             MADtemp.add(Double.toString(Math.abs(val)));
         }
         mad = median(MADtemp);
-
+        //find zscore
         for (int i = 1; i < temp.size(); i++) {
             zscore = Math.abs((0.6745 * ((Double.parseDouble(temp.get(i))) - med)) / mad);
-
-            if (zscore > 3.5) { //if greater, add to queue to be remove from dataset
+            //if greater, add to queue to be remove from dataset
+            if (zscore > 3.5) {
                 removalQueue.add(i);
             }
         }
-        System.out.println(removalQueue);
         remove(temp, removalQueue);
         return removalQueue;
     }
@@ -151,17 +198,26 @@ public class Assignment1 {
         for (int i = 0; i < size; i++) {
             val = removal.get(i) - i;
             //print attribute
-            System.out.print(val);
+            System.out.print(temp.get(val));
             if (i < (size - 1)) {
                 System.out.print(", ");
             }
-            //remove record
-//            temp.remove(val);
-//            for (int j = 1; j < arraylist.size(); j++) {
-//                (arraylist.get(i)).remove(val);
-//            }
+
+            for (ArrayList<String> s : arraylist) {
+                s.remove(s.get(val));
+            }
         }
         System.out.println();
+    }
+
+    static double correlation(ArrayList<String> a, ArrayList<String> b) {
+        double r, pSum = 0, aMean = mean(a), bMean = mean(b), size = a.size();
+        for (int i = 1; i < size; i++) {
+            pSum += (((Double.parseDouble(a.get(i))) - aMean) * ((Double.parseDouble(b.get(i))) - bMean));
+        }
+        r = pSum / ((size - 1) * standardDeviation(a) * standardDeviation(b));
+
+        return r;
     }
 
 }
