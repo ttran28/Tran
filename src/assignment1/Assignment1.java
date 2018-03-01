@@ -88,10 +88,12 @@ public class Assignment1 {
             for (int i = 1; i < arraylist.size(); i++) {
                 zScore(arraylist.get(i));
             }
+            double highest;
+            String a = "", b = "";
 
             //print correlation matrix
-            System.out.print("           ");
-            for (int j = 0; j < arraylist.size(); j++) {
+            System.out.print("Attributes ");
+            for (int j = 1; j < arraylist.size(); j++) {
                 System.out.printf("%13s", arraylist.get(j).get(0));
             }
             System.out.println("");
@@ -99,9 +101,9 @@ public class Assignment1 {
                     + "---------------------------------------------"
                     + "---------------------------------------------"
                     + "---------------------------------------------");
-            for (int i = 0; i < arraylist.size(); i++) {
+            for (int i = 1; i < arraylist.size() - 1; i++) {
                 System.out.printf("%-10s|   ", arraylist.get(i).get(0));
-                for (int j = 0; j < arraylist.size(); j++) {
+                for (int j = 1; j < arraylist.size(); j++) {
                     if (j <= i) {
                         System.out.printf("%10s", "             ");
                     } else {
@@ -111,7 +113,6 @@ public class Assignment1 {
                 System.out.println();
                 
             }
-            //System.out.println(correlation(spreadvol, pivol));
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -179,6 +180,10 @@ public class Assignment1 {
             MADtemp.add(Double.toString(Math.abs(val)));
         }
         mad = median(MADtemp);
+        if (mad == 0) {
+            System.out.println("MAD is equal to 0. Cannot compute outlier.");
+        }
+        
         //find zscore
         for (int i = 1; i < temp.size(); i++) {
             zscore = Math.abs((0.6745 * ((Double.parseDouble(temp.get(i))) - med)) / mad);
@@ -218,6 +223,12 @@ public class Assignment1 {
         r = pSum / ((size - 1) * standardDeviation(a) * standardDeviation(b));
 
         return r;
+    }
+    
+    //method for entropy-based discretization 
+    static double entropy(ArrayList<String> a, double temp) {
+        
+        return 23;
     }
 
 }
