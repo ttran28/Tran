@@ -42,7 +42,8 @@ public class Assignment1 {
 
         try {
             //String fName = "C:\\Users\\Tiffany\\Documents\\College\\CompSci\\assignment.csv";
-            String fName = "C:\\Users\\Tiffany\\Desktop\\Assignment-1-Data.csv";
+            String fName = "C:\\Users\\Tiffany\\Documents\\College\\CompSci\\Assignment-1-Data.csv";
+            //String fName = "C:\\Users\\Tiffany\\Desktop\\Assignment-1-Data.csv";
             FileInputStream fstream = new FileInputStream(fName);
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
@@ -88,7 +89,7 @@ public class Assignment1 {
             for (int i = 1; i < arraylist.size(); i++) {
                 zScore(arraylist.get(i));
             }
-            double highest;
+            double highest = 0;
             String a = "", b = "";
 
             //print correlation matrix
@@ -97,22 +98,35 @@ public class Assignment1 {
                 System.out.printf("%13s", arraylist.get(j).get(0));
             }
             System.out.println("");
-            System.out.println("           ----------------------------------"
-                    + "---------------------------------------------"
-                    + "---------------------------------------------"
-                    + "---------------------------------------------");
+            System.out.println("           ------------------------"
+                    + "--------------------------------------------"
+                    + "--------------------------------------------"
+                    + "--------------------------------------------");
             for (int i = 1; i < arraylist.size() - 1; i++) {
                 System.out.printf("%-10s|   ", arraylist.get(i).get(0));
                 for (int j = 1; j < arraylist.size(); j++) {
+                    double val = correlation(arraylist.get(i), arraylist.get(j));
                     if (j <= i) {
-                        System.out.printf("%10s", "             ");
+                        System.out.printf("%10s", "     ---     ");
                     } else {
-                        System.out.printf("%10s   ", df.format(correlation(arraylist.get(i), arraylist.get(j))));
+                        if (val > highest) {
+                            highest = val;
+                            a = arraylist.get(i).get(0);
+                            b = arraylist.get(j).get(0);
+                        }
+                        System.out.printf("%10s   ", df.format(val));
                     }
                 }
                 System.out.println();
-                
             }
+            System.out.println("Correlation for " + arraylist.get(7).get(0) + " and "
+                    + arraylist.get(4).get(0) + " is: " + correlation(arraylist.get(7), arraylist.get(4)));
+            System.out.println("The highest correlation coefficient is "
+                    + df.format(highest) + " between " + a + " and " + b + ".");
+            System.out.println(arraylist.get(1));
+            System.out.println(arraylist.get(1).size());
+            System.out.println(mean(arraylist.get(1)));
+
         } catch (Exception ex) {
             System.out.println(ex);
         }
@@ -176,14 +190,14 @@ public class Assignment1 {
         med = median(temp);
         //2) subtract this median from each value in x
         for (int i = 1; i < temp.size(); i++) {
-            double val = med - Double.parseDouble(temp.get(i));
+            double val = Double.parseDouble(temp.get(i)) - med;
             MADtemp.add(Double.toString(Math.abs(val)));
         }
         mad = median(MADtemp);
         if (mad == 0) {
             System.out.println("MAD is equal to 0. Cannot compute outlier.");
         }
-        
+
         //find zscore
         for (int i = 1; i < temp.size(); i++) {
             zscore = Math.abs((0.6745 * ((Double.parseDouble(temp.get(i))) - med)) / mad);
@@ -216,7 +230,8 @@ public class Assignment1 {
     }
 
     static double correlation(ArrayList<String> a, ArrayList<String> b) {
-        double r, pSum = 0, aMean = mean(a), bMean = mean(b), size = a.size();
+        double r, pSum = 0, aMean = mean(a), bMean = mean(b);
+        int size = a.size() - 1;
         for (int i = 1; i < size; i++) {
             pSum += (((Double.parseDouble(a.get(i))) - aMean) * ((Double.parseDouble(b.get(i))) - bMean));
         }
@@ -224,10 +239,59 @@ public class Assignment1 {
 
         return r;
     }
-    
+
+    static double probability(ArrayList<String> a, double value) {
+        int size = a.size(), count = 0;
+        for (int i = 1; i < size; i++) {
+            if (Double.parseDouble(a.get(i)) == value) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    //method for entropy-based discretization
+    static double entropy(ArrayList<String> a, double value) {
+        ArrayList<Double> s1 = new ArrayList<>();
+        ArrayList<Double> s1class = new ArrayList<>();
+        ArrayList<Double> s2 = new ArrayList<>();
+        ArrayList<Double> s2class = new ArrayList<>();
+
+        for (int i = 1; i < a.size(); i++) {
+            //pick a value
+            double pivot = Double.parseDouble(a.get(i));
+            for (int j = 1; j < a.size(); j++) {
+                //separate into two groups
+                //treat is the dependent variable
+                if (Double.parseDouble(a.get(j)) >= pivot) {
+                    s1.add(Double.parseDouble(a.get(j)));
+                    s1class.add(Double.parseDouble(treat.get(j)));
+                } else {
+                    s2.add(Double.parseDouble(a.get(j)));
+                    s2class.add(Double.parseDouble(treat.get(j)));
+                }
+            }
+            //calculate information gain (s,v)
+
+        }
+        return 32;
+    }
+
+    //find ent value
+    static double ent(ArrayList<String> a, double value) {
+        int size = a.size();
+        double ent = 0;
+        for (int i = 1; i < size; i++) {
+            double prop = probability(a, value);
+            //log2(prob of value in dependent variable)
+            ent -= prop * (Math.log(prop) / Math.log(2));
+        }
+        return ent;
+    }
+
     //method for entropy-based discretization 
-    static double entropy(ArrayList<String> a, double temp) {
-        
+    static double infoGain(ArrayList<String> a, double value) {
+
         return 23;
     }
 
