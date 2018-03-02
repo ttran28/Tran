@@ -11,6 +11,6 @@
         <title>Multiple-Choice Question by Tiffany Tran</title>
     </head>
     <body>
-        <h3>Multiple-Choice Question!</h3>
+        
     </body>
 </html>
