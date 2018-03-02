@@ -16,58 +16,107 @@ import java.io.InputStreamReader;
 public class TextToDatabase {
 
     private static PreparedStatement insert;
-    private static String line, question = "", choiA = "", choiB = "",
+    static String line, question = "", choiA = "", choiB = "",
             choiC = "", choiD = "", choiE = "", ans = "", hint = "";
     private static int chapNo, length;
 
     public static void main(String[] args) {
         try {
-            for (chapNo = 0; chapNo < 44; chapNo++) {
-                int secNo = 1;
+            //loop through each chapter
+            for (chapNo = 2; chapNo < 3; chapNo++) {
+                int quesNo = 1;
                 String fName = "C:\\Users\\Tiffany\\Documents\\College\\CompSci\\rapid\\questions\\chapter" + chapNo + ".txt";
                 FileInputStream fstream = new FileInputStream(fName);
                 BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
                 String strLine;
-                //Read File Line By Line
+                //Read entire file line by line
                 while ((strLine = br.readLine()) != null) {
-                    
-                    if (strLine.startsWith(secNo + ".")) {
+                    //reads question
+                    if (strLine.startsWith(quesNo + ".")) {
                         length = strLine.length();
                         question = strLine.substring(3, length);
-                    } else if (strLine.startsWith("a. ")) {
-                        length = strLine.length();
-                        choiA = strLine.substring(3, length);
-                    } else if (strLine.startsWith("b. ")) {
-                        length = strLine.length();
-                        choiB = strLine.substring(3, length);
-                    } else if (strLine.startsWith("c. ")) {
-                        length = strLine.length();
-                        choiC = strLine.substring(3, length);
-                    } else if (strLine.startsWith("d. ")) {
-                        length = strLine.length();
-                        choiD = strLine.substring(3, length);
-                    } else if (strLine.startsWith("e. ")) {
-                        length = strLine.length();
-                        choiE = strLine.substring(3, length);
-                    } else if (strLine.startsWith("Key:")) { //pull key and hint
-                        length = strLine.length();
-                        int space = 0;
-                        for (int i = 0; i < length; i++) {
-                            if (strLine.charAt(i) == ' ') {
-                                space = i;
+                        //loop to continue adding to question
+                        while ((strLine = br.readLine()) != null) {
+                            if (strLine.startsWith("a.")) {
+                                length = strLine.length();
+                                choiA = strLine.substring(3, length);
+                                strLine = br.readLine();
+                                //read choice B
+                                if (strLine.startsWith("b.")) {
+                                    length = strLine.length();
+                                    choiB = strLine.substring(3, length);
+                                    strLine = br.readLine();
+                                }
+                                //read choice C
+                                if (strLine.startsWith("c.")) {
+                                    length = strLine.length();
+                                    choiC = strLine.substring(3, length);
+                                    strLine = br.readLine();
+                                }
+                                //read choice D
+                                if (strLine.startsWith("d.")) {
+                                    length = strLine.length();
+                                    choiD = strLine.substring(3, length);
+                                    strLine = br.readLine();
+
+                                }
+                                //read choice E
+                                if (strLine.startsWith("e.")) {
+                                    length = strLine.length();
+                                    choiE = strLine.substring(3, length);
+                                    strLine = br.readLine();
+                                    //pull key(ans) and hint
+                                }
+                                if (strLine.startsWith("Key:")
+                                        || strLine.startsWith("key:")) {
+                                    length = strLine.length();
+                                    int space = 0;
+                                    for (int i = 0; i < length; i++) {
+                                        if (strLine.charAt(i) == ' ') {
+                                            space = i;
+                                            break;
+                                        }
+                                    }
+                                    if (space == 0) {
+                                        space = length;
+                                    }
+                                    ans = strLine.substring(4, space);
+                                }
+
                                 break;
+                            } else {
+                                length = strLine.length();
+                                question += "\n" + strLine;
                             }
                         }
-                        ans = strLine.substring(4, space);
+
+                        System.out.println(quesNo + ") " + question);
+                        System.out.println("a. " + choiA);
+                        System.out.println("b. " + choiB);
+                        System.out.println("c. " + choiC);
+                        System.out.println("d. " + choiD);
+                        System.out.println("e. " + choiE);
+                        System.out.println("Key:" + ans);
+
+                    }
+                    if (strLine.startsWith("#")) {
+                        quesNo++;
+                        question = "";
+                        choiA = "";
+                        choiB = "";
+                        choiC = "";
+                        choiD = "";
+                        choiE = "";
+                        ans = "";
+                        hint = "";
                     }
 
-                    if (strLine.startsWith("#")) {
-                        break;
-                    }
                 }
-                System.out.println(chapNo);
+
+                //insert statement here
             }
+
         } catch (Exception ex) {
             System.out.println(ex);
         }
